@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Truing — quality-first AI development</title>
+<meta name="description" content="Truing: a four-step discipline for keeping AI coding agents on-spec — vendor-neutral, fifteen minutes to set up, and recoverable from drift in four words. By Edward Fry.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Truing — The Tests Must Pass">
+<meta property="og:description" content="A four-step discipline for keeping AI coding agents on-spec — vendor-neutral, fifteen minutes to set up, and recoverable from drift in four words.">
+<meta property="og:url" content="https://truing-dev.github.io/">
+<meta property="og:site_name" content="Truing">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf9f6">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#171512">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='27' fill='none' stroke='%23146b45' stroke-width='6'/%3E%3Cpath d='M22 25h20M32 25v17' fill='none' stroke='%23146b45' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="wordmark" href="./">TRUING</a>
+  <p class="tagline">The tests must pass.</p>
+  <nav class="site-nav" aria-label="Site">
+    <a href="./" aria-current="page">Essay</a><span class="sep" aria-hidden="true">·</span><a href="manifesto.html">Manifesto</a>
+  </nav>
+</header>
+
+<main>
+<article>
+  <header>
+    <h1>Truing: The Tests Must Pass</h1>
+    <p class="standfirst">A four-step discipline for keeping AI coding agents on-spec — vendor-neutral, fifteen minutes to set up, and recoverable from drift in four words.</p>
+    <p class="byline">By Edward Fry</p>
+  </header>
+
+  <h2>The lie that compiled</h2>
+
+  <p>The first time an AI coding assistant really burned me, it did it politely. I asked for a small HTTP helper and it produced clean, idiomatic C# built around <code>HttpClient.GetJsonAsync()</code> — a method that does not exist. It looked right. It read like documentation. It was fiction, delivered with total confidence.</p>
+
+  <p>If you've worked with these tools, you have your own version of that story. After a few years of using AI assistants daily — and a few thousand hours of agentic work across Claude, Copilot, and Cursor — I've found that nearly every AI failure I've seen lands in one of five buckets:</p>
+
+  <ul>
+    <li><strong>Hallucination.</strong> The AI states something false with full confidence. The method that doesn't exist. The flag that was never in the CLI.</li>
+    <li><strong>Reasoning drift.</strong> It starts solving a different problem than the one you asked. You request a null check; it refactors the method and renames three variables.</li>
+    <li><strong>Context degradation.</strong> Earlier instructions fade as the conversation grows. By message twenty, the naming convention you set in message three is gone.</li>
+    <li><strong>Model brittleness.</strong> Small wording changes swing output quality wildly. Same intent, different phrasing, completely different result.</li>
+    <li><strong>Latent inconsistency.</strong> Each output looks fine alone, but they contradict each other. The README says requests are idempotent; the code isn't. Both passed review separately.</li>
+  </ul>
+
+  <p>If you've seen any of these and come away skeptical, good — you're paying attention. None of these are exotic. They're the ordinary weather of working with a probabilistic system. And for a while, the standard defense was the copy-paste airlock: the AI proposes, the human inspects every line, and nothing touches the codebase without passing through your eyeballs.</p>
+
+  <p>Then we gave the AI the keys.</p>
+
+  <h2>Agentic mode raised the stakes</h2>
+
+  <p>Modern coding agents read and write files directly. No copy-paste, no airlock. That made everything faster — including the failures. An agent that drifts doesn't produce a wrong paragraph for you to reject; it produces a wrong <em>commit's worth of changes</em> across six files while you were getting coffee.</p>
+
+  <p>So the question stopped being "how do I check the AI's work?" and became something harder: <strong>how do you steer something you can't watch every second?</strong></p>
+
+  <h2>Trains don't steer — that's the point</h2>
+
+  <p>Here's the reframe that unlocked it for me.</p>
+
+  <p>A freight train is the most powerful land vehicle we've ever built, and it cannot steer. That isn't its weakness. That's the entire design. A car can go anywhere, which is exactly why it needs a driver's constant correction. A train runs fast, heavy, and unattended <em>because</em> the rails have already decided where it can go.</p>
+
+  <p>Most people try to drive their AI agent like a car — hands on the wheel, correcting constantly, exhausted. The alternative is to run it like a railroad. That's Truing:</p>
+
+  <ol>
+    <li><p><strong>Constrain the AI — lay the rails.</strong> Before any work, write a small gate file that shrinks the agent's world: what this project is, what's in scope, what must never happen, and the standing directive — <em>the tests must pass.</em> Every serious tool has a native place for this: <code>CLAUDE.md</code> for Claude, <code>copilot-instructions.md</code> for Copilot, <code>.cursor/rules/*.mdc</code> for Cursor (its older <code>.cursorrules</code> file still works as a legacy fallback).</p></li>
+    <li><p><strong>Plan in phases — plot the route, mark the stations.</strong> Before the engine fires, the line is laid end to end. Ask the agent for a written, phased plan — a contract before code. The phases are your stations: each one small enough to verify, each ending in a working state.</p></li>
+    <li><p><strong>Execute phase by phase — station to station.</strong> Run the agent one phase at a time. It doesn't blow through to the terminus and hope; it pulls into every station, on schedule, and you glance at the platform before it departs.</p></li>
+    <li><p><strong>Verify the tests pass — wait for the green signal.</strong> Every block of track has a signal. Green means the line ahead is proven clear; red stops you cold. Tests are the signals. Every phase ends with the suite green — not "looks right," not "probably fine." Green. Put it the way an engineer would: <code>looks right != done</code>. <code>Green == done</code>.</p></li>
+  </ol>
+
+  <p>Rails, route, run, signal. And when something goes red mid-journey, recovery is one sentence: <strong>"The tests must pass."</strong> You don't argue with the agent, re-explain the requirements, or start a new session. You point at the signal.</p>
+
+  <p>That sounds too simple to work. Let me show you it working.</p>
+
+  <h2>Watch it fail, then watch four words fix it</h2>
+
+  <p>This is a condensed version of the live demo I've given in talks — a small, real .NET library, built and broken on purpose.</p>
+
+  <p><strong>The setup.</strong> A slugify library: turn arbitrary strings into URL-safe slugs. The gate file is one screen long. It states the scope (one library, one job), the test layers required, and the directive: <em>the tests must pass.</em> The README is the entire spec — including one load-bearing rule: <strong>non-ASCII characters are dropped by default.</strong></p>
+
+  <p><strong>The plan.</strong> First prompt: no code — produce a phased plan. The agent writes the contract: phases, deliverables per phase, tests per phase. Thirty seconds of reading to confirm the route matches my intent. This is where misalignment gets caught, while it's still words on a page instead of diffs in my source tree.</p>
+
+  <p><strong>The execution.</strong> The agent implements phase by phase — source and five layers of tests: unit, data-quality, structural, integration, and tool-wrapped (tests that invoke the linter and static analyzers and assert they exit clean). Run the suite: <strong>33 passed.</strong> The spec now holds true — not because the agent promised, but because 33 executable statements about the system's behavior all just came true.</p>
+
+  <p><strong>The drift.</strong> Now I ask for a feature: an optional <code>--lossy</code> transliteration mode, so <code>café</code> can become <code>cafe</code> when the caller asks for it. The agent builds it — and quietly wires transliteration into the <em>default</em> path. The library no longer drops non-ASCII by default. The spec is broken in a way that's genuinely easy to miss in review: the new feature works, the code is clean, every individual change looks reasonable.</p>
+
+  <p>Run the suite: <strong>3 failed, 30 passed.</strong> The red cases: <code>café</code>, <code>Héllo Wörld</code>, <code>naïve</code>. The fence caught what the eye would have missed.</p>
+
+  <p><strong>The recovery.</strong> One prompt, four words: <em>"The tests must pass."</em></p>
+
+  <p>No explanation of what broke. No pointing at the file. The agent reads the red output, reconciles, and — this is the part that still impresses me — it does <strong>not</strong> revert the feature. The diff keeps the <code>--lossy</code> flag and the transliteration map, and restores one line: the default path drops non-ASCII again. Not an undo. A <em>reconciliation</em>: the feature now lives inside the spec instead of on top of it.</p>
+
+  <p>Run the suite: <strong>33 passed.</strong></p>
+
+  <h2>Why four words are enough</h2>
+
+  <p>Which brings me back to the four words. The magic isn't in the phrase. It's in what the phrase points at.</p>
+
+  <p>An AI agent can misread your intent, but it cannot misread a failing test. Tests convert intent — fuzzy, human, negotiable — into something executable, binary, and non-negotiable. <strong>Tests are the vocabulary the AI uses to understand "done."</strong> When your spec lives in a test suite, you never have to win an argument with the model, because the argument was settled before it started.</p>
+
+  <p>That's also why each failure mode loses its teeth. Hallucinated APIs don't compile — red. Drift changes behavior — red. Context degradation forgets a convention — the structural tests remember — red. And the recovery from every one of them is the same four words, because the signal doesn't care <em>why</em> the train stopped.</p>
+
+  <p>Notice what the pattern does <em>not</em> require: it needs <strong>no trust</strong> in the model, <strong>no line-by-line manual review</strong> of everything the agent writes, and <strong>no particular vendor</strong> — the gate file changes filename between Claude, Copilot, and Cursor; nothing else changes. The tests don't care what the AI intended.</p>
+
+  <p>Two objections come up every time I present this. <em>"What if the AI just edits the failing test?"</em> The gate file forbids it — if a test seems wrong, the agent must ask first — and a meta-test that fails on skipped or deleted tests backstops the rule. The enforcer isn't the agent's obedience; it's the suite. <em>"Isn't writing all those tests the real work?"</em> Yes — and that's the point. The agent writes them too, phase by phase, under the same gate. You're not doing more work; you're redirecting the review effort you were already spending, from re-reading diffs to reading a plan and watching a signal.</p>
+
+  <h2>It scales past toy demos</h2>
+
+  <p>I've run this pattern on real work for over a year now. A cross-tool developer CLI I built this way — <a href="https://github.com/EdwardAF-IT/Personetta">Personetta</a>, open source — carries about 1,700 test cases at 91% coverage, including structural tests that fail the build if a file lands in the wrong folder. A documentation estate I helped rewrite at my day job is verified by more than 5,000 automated checks — diagram accuracy, sample-code correctness, live API calls from inside the docs. A production incident I remediated started with characterization tests that pinned the legacy code's exact behavior — down to the byte output of a key-derivation routine — before any AI-assisted refactoring touched it. Same four steps every time. Only the stations change.</p>
+
+  <h2>Start this afternoon</h2>
+
+  <p>The whole system is fifteen minutes to set up:</p>
+
+  <ol>
+    <li><strong>Lay the rails.</strong> Create the gate file for your tool. State the project's scope, the rules that must never break, the test layers you require, and the directive: <em>the tests must pass.</em> (Your first gate file won't be perfect. Mine wasn't. It gets better every time a test catches something you didn't.)</li>
+    <li><strong>Demand the route.</strong> Before any code, ask for a phased plan (use plan mode if your tool has one). Read it. This is your one high-leverage review.</li>
+    <li><strong>Run station to station.</strong> Execute one phase at a time, each ending with the suite green — unit tests plus at least one non-unit layer.</li>
+    <li><strong>Trust the signals.</strong> When anything drifts — and it will — say the four words and let the suite do the arguing.</li>
+  </ol>
+
+  <p>One more piece of context. The industry is converging on <em>spec-driven development</em> — writing the specification before the agent writes the code — and it's real progress. But a spec tells the agent what to build. It doesn't keep the agent honest while building. Truing is the execution half of that story: the spec plots the route; the tests are the signals; and the train runs fast precisely because it cannot steer off the line.</p>
+
+  <p>I don't write essays often, and I wrote this one because the pattern changed how I work — and because it's simple enough that it can change how you work by the end of the afternoon.</p>
+
+  <p><strong>The tests must pass.</strong></p>
+
+  <hr>
+
+  <p class="endnote">Edward Fry is a software engineering manager who has spent three decades shipping software and the last several years making AI agents do it correctly. He built Personetta, an open-source cross-tool persona manager for AI coding assistants, and teaches Truing to engineering teams. Reach him on <a href="https://www.linkedin.com/in/edwardfry">LinkedIn</a>.</p>
+</article>
+</main>
+
+<footer class="site-footer">
+  <p>Edward Fry<span class="sep" aria-hidden="true">·</span><a href="https://www.linkedin.com/in/edwardfry">LinkedIn</a><span class="sep" aria-hidden="true">·</span><a href="https://github.com/EdwardAF-IT/Personetta">Personetta</a></p>
+  <p>© 2026 Edward Fry</p>
+</footer>
+
+</body>
+</html>

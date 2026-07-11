@@ -1,0 +1,302 @@
+/* Truing — truing-dev.github.io */
+
+:root {
+  --bg: #faf9f6;
+  --ink: #201d18;
+  --muted: #6e675c;
+  --accent: #146b45;
+  --rule: #e3ddd2;
+  --code-bg: #f0ece3;
+  --code-ink: #3d3a33;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #171512;
+    --ink: #e7e2d8;
+    --muted: #a09a8d;
+    --accent: #5fc493;
+    --rule: #2e2a24;
+    --code-bg: #24211b;
+    --code-ink: #d8d2c4;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, "Times New Roman", serif;
+  font-size: 1.125rem;
+  line-height: 1.65;
+  overflow-wrap: break-word;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+/* ---- Shell ---- */
+
+.site-header,
+main,
+.site-footer {
+  max-width: 65ch;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+.site-header {
+  padding-top: 2.75rem;
+  text-align: center;
+}
+
+.wordmark {
+  font-family: ui-sans-serif, system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 650;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em; /* optically recenters letterspaced caps */
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.wordmark:hover {
+  color: var(--accent);
+}
+
+.tagline {
+  margin: 0.4rem 0 0;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.site-nav {
+  margin-top: 1.4rem;
+  padding-bottom: 1.4rem;
+  border-bottom: 1px solid var(--rule);
+  font-family: ui-sans-serif, system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+}
+
+.site-nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0.25rem 0.1rem;
+}
+
+.site-nav a:hover {
+  color: var(--accent);
+}
+
+.site-nav a[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 650;
+  border-bottom: 2px solid var(--accent);
+}
+
+.site-nav .sep {
+  color: var(--rule);
+  margin: 0 0.6rem;
+}
+
+/* ---- Article ---- */
+
+main {
+  padding-top: 2.5rem;
+  padding-bottom: 1rem;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 5.5vw, 2.4rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0 0 1rem;
+  font-weight: 700;
+}
+
+.standfirst {
+  font-style: italic;
+  font-size: 1.15em;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 0 0 1rem;
+}
+
+.byline {
+  font-family: ui-sans-serif, system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 2rem;
+}
+
+h2 {
+  font-size: 1.4rem;
+  line-height: 1.25;
+  margin: 2.6rem 0 0.9rem;
+  font-weight: 700;
+}
+
+p {
+  margin: 0 0 1.1rem;
+}
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+strong {
+  font-weight: 700;
+}
+
+ul, ol {
+  margin: 0 0 1.1rem;
+  padding-left: 1.4rem;
+}
+
+li {
+  margin-bottom: 0.55rem;
+}
+
+li > p {
+  margin-bottom: 0.55rem;
+}
+
+hr {
+  border: 0;
+  width: 4rem;
+  border-top: 1px solid var(--muted);
+  margin: 2.6rem auto;
+}
+
+code {
+  font-family: ui-monospace, "Cascadia Code", Consolas, "SF Mono", Menlo, monospace;
+  font-size: 0.85em;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 0.12em 0.35em;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+pre {
+  background: var(--code-bg);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  overflow-x: auto;
+  margin: 0 0 1.1rem;
+  line-height: 1.5;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  white-space: pre;
+  font-size: 0.85rem;
+}
+
+.endnote {
+  font-style: italic;
+  color: var(--muted);
+}
+
+.endnote em {
+  font-style: normal;
+}
+
+/* ---- Footer ---- */
+
+.site-footer {
+  margin-top: 1.5rem;
+  padding-top: 1.6rem;
+  padding-bottom: 3rem;
+  border-top: 1px solid var(--rule);
+  font-family: ui-sans-serif, system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.site-footer p {
+  margin: 0 0 0.4rem;
+}
+
+.site-footer a {
+  color: var(--muted);
+}
+
+.site-footer a:hover {
+  color: var(--accent);
+}
+
+.site-footer .sep {
+  margin: 0 0.45rem;
+  color: var(--rule);
+}
+
+/* ---- Print ---- */
+
+@media print {
+  :root {
+    --bg: #fff;
+    --ink: #000;
+    --muted: #444;
+    --accent: #000;
+    --rule: #999;
+    --code-bg: #fff;
+    --code-ink: #000;
+  }
+
+  body {
+    font-size: 11pt;
+  }
+
+  .site-nav {
+    display: none;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .site-footer a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.9em;
+  }
+
+  code {
+    border: 1px solid #ccc;
+  }
+
+  h1, h2 {
+    break-after: avoid;
+  }
+
+  li, pre {
+    break-inside: avoid;
+  }
+}

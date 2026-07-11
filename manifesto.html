@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Craftsmanship Didn't Die. It Moved. — Truing</title>
+<meta name="description" content="A manifesto for quality-first AI development. AI didn't make software craftsmanship obsolete — it industrialized the need for it. By Edward Fry.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Craftsmanship Didn't Die. It Moved.">
+<meta property="og:description" content="A manifesto for quality-first AI development. AI didn't make software craftsmanship obsolete — it industrialized the need for it.">
+<meta property="og:url" content="https://truing-dev.github.io/manifesto.html">
+<meta property="og:site_name" content="Truing">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf9f6">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#171512">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='27' fill='none' stroke='%23146b45' stroke-width='6'/%3E%3Cpath d='M22 25h20M32 25v17' fill='none' stroke='%23146b45' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="wordmark" href="./">TRUING</a>
+  <p class="tagline">The tests must pass.</p>
+  <nav class="site-nav" aria-label="Site">
+    <a href="./">Essay</a><span class="sep" aria-hidden="true">·</span><a href="manifesto.html" aria-current="page">Manifesto</a>
+  </nav>
+</header>
+
+<main>
+<article>
+  <header>
+    <h1>Craftsmanship Didn't Die. It Moved.</h1>
+    <p class="standfirst">A manifesto for quality-first AI development</p>
+    <p class="byline">Edward Fry</p>
+  </header>
+
+  <p>AI is writing our code now. Nearly half of it, by some measures. And the industry is quietly discovering what that costs.</p>
+
+  <p>The numbers are no longer arguable. Across 211 million lines of code, duplication has doubled while refactoring has halved — and for the first time on record, copy-paste outpaced refactoring. Teams ship 20% more pull requests and suffer 23% more incidents per pull request. Unmanaged AI code drives maintenance costs toward four times normal by the second year. Researchers even coined a term for the newest liability: <em>comprehension debt</em> — code arriving five to seven times faster than any human can understand it.</p>
+
+  <p>Everyone can feel it. The developers are frustrated. The managers are staring at flat delivery metrics next to rising license bills. And the loudest response — <em>slow down, review harder, trust less</em> — is a losing strategy, because it spends the one resource agentic speed already exhausts: human attention.</p>
+
+  <p>Here is what I believe instead.</p>
+
+  <p><strong>AI didn't make software craftsmanship obsolete. It industrialized the need for it.</strong></p>
+
+  <p>For seventy years, code quality lived in human habits. We hired for it, mentored for it, reviewed for it, wrote books about it. Clean code, SOLID, test-driven development — an entire craft tradition, transmitted from person to person, enforced by discipline and culture.</p>
+
+  <p>That transmission mechanism just broke. Not because the principles stopped being true — because the "developer" is now partly a machine, and a machine cannot absorb culture. It doesn't attend your code reviews. It doesn't feel shame when the build breaks. It will cheerfully write the same duplicated, untested, convention-violating code at 2 a.m. that it wrote at 2 p.m., at a thousand lines a minute.</p>
+
+  <p>So the discipline has to move. <strong>Out of human habits, and into executable artifacts.</strong></p>
+
+  <ul>
+    <li>Your standards can't live in a style guide the AI never reads. They have to live in <strong>personas and gate files</strong> — versioned, composable, installed into every tool, every session, every time.</li>
+    <li>Your intent can't live in a conversation that degrades as the context grows. It has to live in <strong>phased plans</strong> — contracts written before code, small enough to verify station by station.</li>
+    <li>And "done" can't live in anyone's opinion — human or machine. It has to live in <strong>tests</strong>: layered, ruthless, executable statements of what the system must do, which an AI cannot misread, cannot argue with, and cannot charm its way past.</li>
+  </ul>
+
+  <p>That's the whole philosophy: <em>if a machine is going to do the work, the craftsmanship has to be machine-enforceable.</em> Everything I build and teach is an expression of it:</p>
+
+  <p><strong>Codify.</strong> <a href="https://github.com/EdwardAF-IT/Personetta">Personetta</a> — an open-source tool that turns quality standards into distributable artifacts: composable personas and recipes that install your engineering values into Claude, Copilot, Cursor, and whatever comes next. Because retyping your principles into every session isn't discipline; it's hope.</p>
+
+  <p><strong>Enforce.</strong> <a href="./">Truing</a> — a four-step execution discipline: constrain the agent, plan in phases, execute station to station, verify green at every stop. Drift happens; the tests catch it; recovery takes four words. <em>The tests must pass.</em></p>
+
+  <p><strong>Teach.</strong> <a href="./">The essay</a> · articles and talks — because tools without practice become shelfware, and the teams drowning in AI slop don't need another tool first. They need the discipline that makes every tool safe.</p>
+
+  <p>I've spent 31 years shipping software — as a developer, a Microsoft engineering leader, and a manager of teams. I've spent the last several running AI enablement for a real engineering organization and holding the line on quality with agents in the loop, every day. This isn't theory about what AI might do to codebases. It's field notes from keeping one clean.</p>
+
+  <p>The teams that thrive in the next decade won't be the ones that used AI most. They'll be the ones that stayed <em>craftsmen</em> while using it — the ones whose standards survived the handoff to the machine because they wrote those standards down in the only language a machine respects: executable ones.</p>
+
+  <p><strong>The tools are here. The discipline is teachable. The tests must pass.</strong></p>
+
+  <hr>
+
+  <p class="endnote">Start with <a href="./">the essay</a>. Then equip your tools with <a href="https://github.com/EdwardAF-IT/Personetta">Personetta</a>.</p>
+</article>
+</main>
+
+<footer class="site-footer">
+  <p>Edward Fry<span class="sep" aria-hidden="true">·</span><a href="https://www.linkedin.com/in/edwardfry">LinkedIn</a><span class="sep" aria-hidden="true">·</span><a href="https://github.com/EdwardAF-IT/Personetta">Personetta</a></p>
+  <p>© 2026 Edward Fry</p>
+</footer>
+
+</body>
+</html>
