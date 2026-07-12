@@ -33,11 +33,15 @@
     <p class="byline">By Edward Fry</p>
   </header>
 
-  <h2>The lie that read like documentation</h2>
+  <h2>Whack-a-mole</h2>
 
-  <p>The first time an AI coding assistant really burned me, it did it politely. I asked for a small HTTP helper and it produced clean, idiomatic C# built around <code>HttpClient.GetJsonAsync()</code> — a method that no longer existed in the framework we were running; it had been real once, in early Blazor, and that near-miss is exactly what made it convincing. It looked right. It read like documentation. It was fiction, delivered with total confidence.</p>
+  <p>The first time an AI coding assistant really burned me, it didn't do it in one dramatic stroke. It did it slowly, two hours at a time. This was last fall, when I was just getting into AI — Copilot in a browser tab, me copying code back and forth all day. We'd hash out a fix over a dozen exchanges, get it working, and move on to the next thing. Then, a couple of hours later, the AI would hand me code for something else we were working on — and that new code would quietly break the thing we'd fixed before lunch. Sometimes it broke several things. I'd rework them, we'd move on, and the cycle would start again. Whack-a-mole, with my own project as the board.</p>
 
-  <p>If you've worked with these tools, you have your own version of that story. After a few years of using AI assistants daily — and a few thousand hours of agentic work across Claude, Copilot, and Cursor — I've found that nearly every AI failure I've seen lands in one of five buckets:</p>
+  <p>The first casualty, as best I can recall, was an Azure DevOps pipeline — some PowerShell provisioning scripts called from YAML. I couldn't tell you the exact line anymore. But I can tell you the pattern, because it repeated for weeks: every new fix was a quiet bet that nothing old depended on what it just changed, and the AI never remembered placing the bet.</p>
+
+  <p>What finally stopped the thrash wasn't reviewing harder. It was a demand I started making every time we got something fixed: <em>now write me a test for it.</em> Once a behavior had a test standing guard, the AI couldn't silently break it three hours later. The test spoke up — even when neither of us remembered the code it was guarding.</p>
+
+  <p>If you've worked with these tools, you have your own version of that story. Since then I've worked with them every day — agentic since early this year, across Claude, Copilot, and Cursor — and I've found that nearly every AI failure I've seen lands in one of five buckets:</p>
 
   <ul>
     <li><strong>Hallucination.</strong> The AI states something false with full confidence. The method that doesn't exist. The flag that was never in the CLI.</li>
@@ -47,15 +51,15 @@
     <li><strong>Latent inconsistency.</strong> Each output looks fine alone, but they contradict each other. The README says requests are idempotent; the code isn't. Both passed review separately.</li>
   </ul>
 
-  <p>If you've seen any of these and come away skeptical, good — you're paying attention. None of these are exotic. They're the ordinary weather of working with a probabilistic system. And for a while, the standard defense was the copy-paste airlock: the AI proposes, the human inspects every line, and nothing touches the codebase without passing through your eyeballs.</p>
+  <p>If you've seen any of these and come away skeptical, good — you're paying attention. None of these are exotic. They're the ordinary weather of working with a probabilistic system. And here's the uncomfortable part: my whack-a-mole months happened <em>inside</em> the supposed defense — the copy-paste airlock, where the AI proposes and the human inspects every line. I was reading everything. The failures weren't in the lines I was reading. They were in the relationship between the new code and the code from three hours ago.</p>
 
   <p>Then we gave the AI the keys.</p>
 
   <h2>Agentic mode raised the stakes</h2>
 
-  <p>Modern coding agents read and write files directly. No copy-paste, no airlock. That made everything faster — including the failures. An agent that drifts doesn't produce a wrong paragraph for you to reject; it produces a wrong <em>commit's worth of changes</em> across six files while you were getting coffee.</p>
+  <p>Modern coding agents read and write files directly. No copy-paste, no airlock. That made everything faster — including the failures. When I went agentic early this year, the whack-a-mole came right back at commit scale: an agent that drifts doesn't produce a wrong paragraph for you to reject; it produces a wrong <em>commit's worth of changes</em> across six files while you were getting coffee.</p>
 
-  <p>So the question stopped being "how do I check the AI's work?" and became something harder: <strong>how do you steer something you can't watch every second?</strong></p>
+  <p>So I doubled down on the demand that had saved me in the fall. Tests written right after — sometimes right before — each small piece of functionality. Aggressive coverage bars: 90% unit, 50% integration. And one standing rule: all tests pass, at all times. That mostly solved the problem, so I leaned into it. What took longer was understanding <em>why</em> it worked — because the question underneath it isn't "how do I check the AI's work?" It's harder than that: <strong>how do you steer something you can't watch every second?</strong></p>
 
   <h2>Trains don't steer — that's the point</h2>
 
@@ -104,13 +108,13 @@
 
   <p>That's also why each failure mode loses its teeth. Hallucinated APIs don't compile — red. Drift changes behavior — red. Context degradation forgets a convention — the structural tests remember — red. And the recovery from every one of them is the same four words, because the signal doesn't care <em>why</em> the train stopped.</p>
 
-  <p>Notice what the pattern does <em>not</em> require. It doesn't run on trust in the model — it <strong>moves the trust to the suite</strong>, where it's re-earned on every run. It needs <strong>no line-by-line manual review</strong> of everything the agent writes, and <strong>no particular vendor</strong> — the gate file changes filename between Claude, Copilot, and Cursor; nothing else changes. The tests don't care what the AI intended.</p>
+  <p>Notice what the pattern does <em>not</em> require. It doesn't run on trust in the model — it <strong>moves the trust to the suite</strong>, where it's re-earned on every run. Even if the AI has forgotten it wrote the code that's now breaking the tests, it's still responsible for fixing what it broke. It needs <strong>no line-by-line manual review</strong> of everything the agent writes, and <strong>no particular vendor</strong> — the gate file changes filename between Claude, Copilot, and Cursor; nothing else changes. The tests don't care what the AI intended.</p>
 
   <p>Two objections come up every time I present this. <em>"What if the AI just edits the failing test?"</em> The gate file forbids it — if a test seems wrong, the agent must ask first — and a meta-test that fails on skipped or deleted tests backstops the rule. The enforcer isn't the agent's obedience; it's the suite. <em>"Isn't writing all those tests the real work?"</em> Yes — and that's the point. The agent writes them too, phase by phase, under the same gate — and the plan you review includes the test list, so the spec's load-bearing rules get pinned by early-phase tests before any later feature can drift past them. You're not doing more work; you're redirecting the review effort you were already spending, from re-reading diffs to reading a plan and watching a signal.</p>
 
   <h2>It scales past toy demos</h2>
 
-  <p>I've run this pattern on real work for over a year now. A cross-tool developer CLI I built this way — <a href="https://github.com/EdwardAF-IT/Personetta">Personetta</a>, open source — carries about 1,700 test cases at 91% coverage, including structural tests that fail the build if a file lands in the wrong folder. A documentation estate I helped rewrite is verified by more than 5,000 automated checks — diagram accuracy, sample-code correctness, live API calls from inside the docs. A production incident I remediated started with characterization tests that pinned the legacy code's exact behavior — down to the byte output of a key-derivation routine — before any AI-assisted refactoring touched it. Same four steps every time. Only the stations change.</p>
+  <p>I've been running this discipline on real work since those whack-a-mole weeks — codified into the four steps once the agents arrived. A cross-tool developer CLI I built this way — <a href="https://github.com/EdwardAF-IT/Personetta">Personetta</a>, open source — carries about 1,700 test cases at 91% coverage, including structural tests that fail the build if a file lands in the wrong folder. A documentation estate I helped rewrite is verified by more than 5,000 automated checks — diagram accuracy, sample-code correctness, live API calls from inside the docs. A production incident I remediated started with characterization tests that pinned the legacy code's exact behavior — down to the byte output of a key-derivation routine — before any AI-assisted refactoring touched it. Same four steps every time. Only the stations change.</p>
 
   <h2>Start this afternoon</h2>
 
@@ -131,7 +135,7 @@
 
   <hr>
 
-  <p class="endnote">Edward Fry is a software engineering manager who has spent three decades shipping software and the last several years making AI agents do it correctly. He built Personetta, an open-source cross-tool persona manager for AI coding assistants, and teaches Truing to engineering teams. Reach him on <a href="https://www.linkedin.com/in/edwardfry">LinkedIn</a>.</p>
+  <p class="endnote">Edward Fry is a software engineering manager who has spent three decades shipping software and the past year making AI agents do it correctly. He built Personetta, an open-source cross-tool persona manager for AI coding assistants, and teaches Truing to engineering teams. Reach him on <a href="https://www.linkedin.com/in/edwardfry">LinkedIn</a>.</p>
 </article>
 </main>
 
