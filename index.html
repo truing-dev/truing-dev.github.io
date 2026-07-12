@@ -35,13 +35,13 @@
 
   <h2>Whack-a-mole</h2>
 
-  <p>The first time an AI coding assistant really burned me, it didn't do it in one dramatic stroke. It did it slowly, two hours at a time. This was last fall, when I was just getting into AI — Copilot in a browser tab, me copying code back and forth all day. We'd hash out a fix over a dozen exchanges, get it working, and move on to the next thing. Then, a couple of hours later, the AI would hand me code for something else we were working on — and that new code would quietly break the thing we'd fixed before lunch. Sometimes it broke several things. I'd rework them, we'd move on, and the cycle would start again. Whack-a-mole, with my own project as the board.</p>
+  <p>The first time an AI coding assistant really burned me, it didn't do it in one dramatic stroke. It did it slowly, two hours at a time. This was late last summer, when I was just getting into AI — Copilot in a browser tab, me copying code back and forth all day. We'd hash out a fix over a dozen exchanges, get it working, and move on to the next thing. Then, a couple of hours later, the AI would hand me code for something else we were working on — and that new code would quietly break the thing we'd fixed before lunch. Sometimes it broke several things. I'd rework them, we'd move on, and the cycle would start again. Whack-a-mole, with my own project as the board.</p>
 
   <p>The first casualty, as best I can recall, was an Azure DevOps pipeline — some PowerShell provisioning scripts called from YAML. I couldn't tell you the exact line anymore. But I can tell you the pattern, because it repeated for weeks: every new fix was a quiet bet that nothing old depended on what it just changed, and the AI never remembered placing the bet.</p>
 
   <p>What finally stopped the thrash wasn't reviewing harder. It was a demand I started making every time we got something fixed: <em>now write me a test for it.</em> Once a behavior had a test standing guard, the AI couldn't silently break it three hours later. The test spoke up — even when neither of us remembered the code it was guarding.</p>
 
-  <p>If you've worked with these tools, you have your own version of that story. Since then I've worked with them every day — agentic since early this year, across Claude, Copilot, and Cursor — and I've found that nearly every AI failure I've seen lands in one of five buckets:</p>
+  <p>If you've worked with these tools, you have your own version of that story. Since then it's been nearly every day — day-job projects through the week, my own systems on evenings and weekends, agentic since early this year across Claude, Copilot, Cursor, and Cline. Most of what follows was learned the expensive way, and nearly every AI failure I've seen lands in one of five buckets:</p>
 
   <ul>
     <li><strong>Hallucination.</strong> The AI states something false with full confidence. The method that doesn't exist. The flag that was never in the CLI.</li>
