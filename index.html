@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Truing — quality-first AI development</title>
-<meta name="description" content="Truing: a four-step discipline for keeping AI coding agents on-spec — vendor-neutral, fifteen minutes to set up, and recoverable from drift in four words. By Edward Fry.">
+<title>Truing · quality-first AI development</title>
+<meta name="description" content="Truing: a four-step discipline for keeping AI coding agents on-spec. Vendor-neutral, fifteen minutes to set up, and recoverable from drift in four words. By Edward Fry.">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Truing — The Tests Must Pass">
-<meta property="og:description" content="A four-step discipline for keeping AI coding agents on-spec — vendor-neutral, fifteen minutes to set up, and recoverable from drift in four words.">
+<meta property="og:title" content="Truing: The Tests Must Pass">
+<meta property="og:description" content="A four-step discipline for keeping AI coding agents on-spec. Vendor-neutral, fifteen minutes to set up, and recoverable from drift in four words.">
 <meta property="og:url" content="https://truing-dev.github.io/">
 <meta property="og:site_name" content="Truing">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf9f6">
@@ -29,107 +29,117 @@
 <article>
   <header>
     <h1>Truing: The Tests Must Pass</h1>
-    <p class="standfirst">A four-step discipline for keeping AI coding agents on-spec — vendor-neutral, fifteen minutes to set up, and recoverable from drift in four words.</p>
+    <p class="standfirst">A four-step discipline for keeping AI coding agents on-spec. Vendor-neutral, fifteen minutes to set up, and recoverable from drift in four words.</p>
     <p class="byline">By Edward Fry</p>
   </header>
 
   <h2>Whack-a-mole</h2>
 
-  <p>The first time an AI coding assistant really burned me, it didn't do it in one dramatic stroke. It did it slowly, two hours at a time. This was late last summer, when I was just getting into AI — Copilot in a browser tab, me copying code back and forth all day. We'd hash out a fix over a dozen exchanges, get it working, and move on to the next thing. Then, a couple of hours later, the AI would hand me code for something else we were working on — and that new code would quietly break the thing we'd fixed before lunch. Sometimes it broke several things. I'd rework them, we'd move on, and the cycle would start again. Whack-a-mole, with my own project as the board.</p>
+  <p>The first time an AI coding assistant really burned me, it didn't do it in one dramatic stroke. It did it five to ten minutes at a time, for months.</p>
 
-  <p>The first casualty, as best I can recall, was an Azure DevOps pipeline — some PowerShell provisioning scripts called from YAML. I couldn't tell you the exact line anymore. But I can tell you the pattern, because it repeated for weeks: every new fix was a quiet bet that nothing old depended on what it just changed, and the AI never remembered placing the bet.</p>
+  <p>This was late last summer. The project, believe it or not, was a video game I was building with my family.. and since I was the only one with the skill set, the Azure DevOps setup fell to me. What I actually needed was simple: a build pipeline. Some PowerShell scripts called from YAML to deploy a function app and a few other Azure resources. I figured the AI could help me knock it out real quick. Real quick turned into months, off and on.</p>
 
-  <p>What finally stopped the thrash wasn't reviewing harder. It was a demand I started making every time we got something fixed: <em>now write me a test for it.</em> Once a behavior had a test standing guard, the AI couldn't silently break it three hours later. The test spoke up — even when neither of us remembered the code it was guarding.</p>
+  <p>Here's what the loop looked like. I'd ask Copilot, in a browser tab (this was before I knew anything about agents), for some pipeline code. Copy, paste into Visual Studio, push, then wait five or ten minutes watching the build run. Something was wrong.. Every. Single. Time. So I'd copy the errors back to the AI, read a long-winded explanation, paste in its next attempt, and around we'd go again. I kept the same chat going for weeks because I didn't want to retype everything it had already learned. By the end, finding something from earlier in the conversation meant scrolling back for the better part of an hour. Le sigh.</p>
 
-  <p>If you've worked with these tools, you have your own version of that story. Since then it's been nearly every day — day-job projects through the week, my own systems on evenings and weekends, agentic since early this year across Claude, Copilot, Cursor, and Cline. Most of what follows was learned the expensive way, and nearly every AI failure I've seen lands in one of five buckets:</p>
+  <p>The copy-paste part was just tedious. The real pain was sneakier: the fixes wouldn't stay fixed. I'd ask for a correction to the deployment script, and the code it handed back would quietly break something older.. like forget to deploy the actual function app the whole thing existed for, or drop a call some other script depended on. The storage account bug we'd killed three days earlier would rise from the dead, because the AI had restructured how the resource group got created and never noticed what relied on the old way. I'd tell it "no magic constants" (a pet peeve of mine), and it would comply for a while, then happily go right back to hard-coding file paths. Every new fix was a quiet bet that nothing old depended on what it just changed, and the AI never remembered placing the bet.</p>
+
+  <p>What finally got me out wasn't reviewing harder. It was a demand I started making every time we got something working: <em>now write me a test to lock it in.</em> Once a behavior had a test standing guard, the AI couldn't silently break it three days later. The test spoke up, even when neither of us remembered the code it was guarding.</p>
+
+  <p>If you've worked with these tools, you have your own version of that story. Since then it's been nearly every day for me: day-job projects through the week, my own systems on evenings and weekends, agentic since early this year across Claude, Copilot, Cursor, and Cline. Most of what follows was learned the expensive way, and nearly every AI failure I've seen lands in one of five buckets. The names aren't mine (the industry has mostly settled on them), but the scars are:</p>
 
   <ul>
     <li><strong>Hallucination.</strong> The AI states something false with full confidence. The method that doesn't exist. The flag that was never in the CLI.</li>
-    <li><strong>Reasoning drift.</strong> It starts solving a different problem than the one you asked. You request a null check; it refactors the method and renames three variables.</li>
+    <li><strong>Reasoning drift.</strong> It starts solving a different problem than the one you asked for. You request a null check; it refactors the method and renames three variables.</li>
     <li><strong>Context degradation.</strong> Earlier instructions fade as the conversation grows. By message twenty, the naming convention you set in message three is gone.</li>
     <li><strong>Model brittleness.</strong> Small wording changes swing output quality wildly. Same intent, different phrasing, completely different result.</li>
     <li><strong>Latent inconsistency.</strong> Each output looks fine alone, but they contradict each other. The README says requests are idempotent; the code isn't. Both passed review separately.</li>
   </ul>
 
-  <p>If you've seen any of these and come away skeptical, good — you're paying attention. None of these are exotic. They're the ordinary weather of working with a probabilistic system. And here's the uncomfortable part: my whack-a-mole months happened <em>inside</em> the supposed defense — the copy-paste airlock, where the AI proposes and the human inspects every line. I was reading everything. The failures weren't in the lines I was reading. They were in the relationship between the new code and the code from three hours ago.</p>
+  <p>If you've seen any of these and come away skeptical, good. You're paying attention. None of this is exotic. It's the ordinary weather of working with a probabilistic system. And here's the uncomfortable part: my whack-a-mole months happened <em>inside</em> the supposed defense, the copy-paste airlock, where the AI proposes and the human inspects every line. I was reading everything. The failures weren't in the lines I was reading. They were in the relationship between the new code and the code from three hours ago.</p>
 
   <p>Then we gave the AI the keys.</p>
 
   <h2>Agentic mode raised the stakes</h2>
 
-  <p>Modern coding agents read and write files directly. No copy-paste, no airlock. That made everything faster — including the failures. When I went agentic early this year, the whack-a-mole came right back at commit scale: an agent that drifts doesn't produce a wrong paragraph for you to reject; it produces a wrong <em>commit's worth of changes</em> across six files while you were getting coffee.</p>
+  <p>Modern coding agents read and write files directly. No copy-paste, no airlock. That made everything faster, including the failures. When I went agentic early this year, the whack-a-mole came right back at commit scale: an agent that drifts doesn't produce a wrong paragraph for you to reject; it produces a wrong <em>commit's worth of changes</em> across six files while you were getting coffee.</p>
 
-  <p>So I doubled down on the demand that had saved me in the fall. Tests written right after — sometimes right before — each small piece of functionality. Aggressive coverage bars: 90% unit, 50% integration. And one standing rule: all tests pass, at all times. That mostly solved the problem, so I leaned into it. What took longer was understanding <em>why</em> it worked — because the question underneath it isn't "how do I check the AI's work?" It's harder than that: <strong>how do you steer something you can't watch every second?</strong></p>
+  <p>So I doubled down on the demand that had saved me in the fall. Tests written right after (sometimes right before) each small piece of functionality. Aggressive coverage bars: 90% unit, 50% integration. And one standing rule: all tests pass, at all times. That mostly solved the problem, so I leaned into it. What took longer was understanding <em>why</em> it worked. Because the question underneath isn't "how do I check the AI's work?" It's harder than that: <strong>how do you steer something you can't watch every second?</strong></p>
 
-  <h2>Trains don't steer — that's the point</h2>
+  <h2>Trains don't steer. That's the point.</h2>
 
   <p>Here's the reframe that made it click for me.</p>
 
-  <p>A freight train is the most powerful land vehicle we run unattended, and it cannot steer. That isn't its weakness. That's the entire design. A car can go anywhere, which is exactly why it needs a driver's constant correction. A train runs fast, heavy, and unattended <em>because</em> the rails have already decided where it can go.</p>
+  <p>A freight train is the most powerful land vehicle we run unattended, and it cannot steer. That isn't a weakness. That's the entire design. Think about the physics for a second: all that mass at speed is not going to stop quickly, and it is definitely not going to swerve. A car can go anywhere, which is exactly why it needs a driver's constant correction. A train runs fast, heavy, and unattended <em>because</em> the rails have already decided where it can go.</p>
 
-  <p>Most people try to drive their AI agent like a car — hands on the wheel, correcting constantly, exhausted. The alternative is to run it like a railroad. That's Truing:</p>
+  <p>Most people try to drive their AI agent like a car. Hands on the wheel, correcting constantly, exhausted. The alternative is to run it like a railroad. That's <em>Truing</em>:</p>
 
   <ol>
-    <li><p><strong>Constrain the AI — lay the rails.</strong> Before any work, write a small gate file that shrinks the agent's world: what this project is, what's in scope, what must never happen, and the standing directive — <em>the tests must pass.</em> Every serious tool has a native place for this: <code>CLAUDE.md</code> for Claude, <code>copilot-instructions.md</code> for Copilot, <code>.cursor/rules/*.mdc</code> for Cursor (its older <code>.cursorrules</code> file still works as a legacy fallback).</p></li>
-    <li><p><strong>Plan in phases — plot the route, mark the stations.</strong> Before the engine fires, the line is laid end to end. Ask the agent for a written, phased plan — a contract before code. The phases are your stations: each one small enough to verify, each ending in a working state.</p></li>
-    <li><p><strong>Execute phase by phase — station to station.</strong> Run the agent one phase at a time. It doesn't blow through to the terminus and hope; it pulls into every station, on schedule, and you glance at the platform before it departs.</p></li>
-    <li><p><strong>Verify the tests pass — wait for the green signal.</strong> Every block of track has a signal. Green means the line ahead is proven clear; red stops you cold. Tests are the signals. Every phase ends with the suite green — not "looks right," not "probably fine." Green. Put it the way an engineer would: <code>looks right != done</code>. <code>Green == done</code>.</p></li>
+    <li><p><strong>Constrain the AI: lay the rails.</strong> Before any work, write a small gate file that shrinks the agent's world: what this project is, what's in scope, what must never happen, and the standing directive.. <em>the tests must pass.</em> Every serious tool has a native place for this: <code>CLAUDE.md</code> for Claude, <code>copilot-instructions.md</code> for Copilot, <code>.cursor/rules/*.mdc</code> for Cursor (its older <code>.cursorrules</code> file still works as a legacy fallback). Or even just start your prompt by saying, "Constrain your work to the <code>&lt;whatever&gt;</code> folder." It really doesn't have to be complicated.</p></li>
+    <li><p><strong>Plan in phases: plot the route, mark the stations.</strong> Before the engine fires, the line is laid end to end. Ask the agent for a written, phased plan.. a contract before code. Tell it the <em>what</em>, not the <em>how</em>; if you're paying for an advanced model, let it figure out the best how. Then go back and forth with it on the plan, as many times as it takes, two colleagues collaborating, until what's written down matches what's in your head. The phases are your stations: each one small enough to verify, each ending in a working state.</p></li>
+    <li><p><strong>Execute phase by phase: station to station.</strong> Run the agent one phase at a time. It doesn't blow through to the terminus and hope; it pulls into every station, on schedule, and you glance at the platform before it departs.</p></li>
+    <li><p><strong>Verify the tests pass: wait for the green signal.</strong> And did I mention that every phase of the plan requires those aggressive tests? Every block of track has a signal. Green means the line ahead is proven clear; red stops you cold. Tests are the signals. Every phase ends with the suite green. Not "looks right," not "probably fine." Green. Put it the way an engineer would: <code>looks right != done</code>. <code>Green == done</code>.</p></li>
   </ol>
 
-  <p>Rails, route, run, signal. And when something goes red mid-journey, recovery is one sentence: <strong>"The tests must pass."</strong> You don't argue with the agent, re-explain the requirements, or start a new session. You point at the signal.</p>
+  <p>Rails, route, run, signal. And when something goes red mid-journey, recovery is one sentence: <strong>"The tests must pass."</strong> You don't argue with the agent, re-explain the requirements, or start a new session. You point at the signal. The tests form a completely deterministic expression of the specification, which is precisely what a stochastic tool needs to stay on course.</p>
 
   <p>That sounds too simple to work. Let me show you it working.</p>
 
   <h2>Watch it fail, then watch four words fix it</h2>
 
-  <p>This is a condensed version of the live demo I've given in talks — a small, real .NET library, built and broken on purpose.</p>
+  <p>This is a condensed version of the live demo I've given in talks: a small, real .NET library, built and broken on purpose.</p>
 
-  <p><strong>The setup.</strong> A slugify library: turn arbitrary strings into URL-safe slugs. The gate file is one screen long. It states the scope (one library, one job), the test layers required, and the directive: <em>the tests must pass.</em> The README is the entire spec — including one load-bearing rule: <strong>non-ASCII characters are dropped by default.</strong></p>
+  <p><strong>The setup.</strong> A slugify library: turn arbitrary strings into URL-safe slugs. The gate file is one screen long. It states the scope (one library, one job), the test layers required, and the directive: <em>the tests must pass.</em> The README is the entire spec, including one load-bearing rule: <strong>non-ASCII characters are dropped by default.</strong></p>
 
-  <p><strong>The plan.</strong> First prompt: no code — produce a phased plan. The agent writes the contract: phases, deliverables per phase, tests per phase. Thirty seconds of reading to confirm the route matches my intent. This is where misalignment gets caught, while it's still words on a page instead of diffs in my source tree.</p>
+  <p><strong>The plan.</strong> First prompt: no code. Produce a phased plan. The agent writes the contract: phases, deliverables per phase, tests per phase. Thirty seconds of reading to confirm the route matches my intent. This is where misalignment gets caught, while it's still words on a page instead of diffs in my source tree.</p>
 
-  <p><strong>The execution.</strong> The agent implements phase by phase — source and five layers of tests: unit, data-quality, structural, integration, and tool-wrapped (tests that invoke the linter and static analyzers and assert they exit clean). Run the suite: <strong>33 passed.</strong> The spec now holds true — not because the agent promised, but because 33 executable statements about the system's behavior all just came true.</p>
+  <p><strong>The execution.</strong> The agent implements phase by phase: source and five layers of tests. Unit, data-quality, structural, integration, and tool-wrapped (tests that invoke the linter and static analyzers and assert they exit clean). Run the suite: <strong>33 passed.</strong> The spec now holds true. Not because the agent promised. Because 33 executable statements about the system's behavior all just came true.</p>
 
-  <p><strong>The drift.</strong> Now I ask for a feature: an optional <code>--lossy</code> transliteration mode, so <code>café</code> can become <code>cafe</code> when the caller asks for it. The agent builds it — and quietly wires transliteration into the <em>default</em> path. The library no longer drops non-ASCII by default. The spec is broken in a way that's genuinely easy to miss in review: the new feature works, the code is clean, every individual change looks reasonable.</p>
+  <p><strong>The drift.</strong> Now I ask for a feature: an optional <code>--lossy</code> transliteration mode, so <code>café</code> can become <code>cafe</code> when the caller asks for it. The agent builds it.. and quietly wires transliteration into the <em>default</em> path. The library no longer drops non-ASCII by default. The spec is broken in a way that's genuinely easy to miss in review: the new feature works, the code is clean, every individual change looks reasonable.</p>
 
   <p>Run the suite: <strong>3 failed, 30 passed.</strong> The red cases: <code>café</code>, <code>Héllo Wörld</code>, <code>naïve</code>. The fence caught what the eye would have missed.</p>
 
   <p><strong>The recovery.</strong> One prompt, four words: <em>"The tests must pass."</em></p>
 
-  <p>No explanation of what broke. No pointing at the file. The agent reads the red output, reconciles, and — this is the part that still impresses me — it does <strong>not</strong> revert the feature. The diff keeps the <code>--lossy</code> flag and the transliteration map, and restores one line: the default path drops non-ASCII again. Not an undo. A <em>reconciliation</em>: the feature now lives inside the spec instead of on top of it. That's the move the method is named for: when a railroad wheel wears out of round, you don't rebuild it — you <em>true</em> it, machining it back to the shape the rails require.</p>
+  <p>No explanation of what broke. No pointing at the file. The agent reads the red output, reconciles, and (this is the part that still makes me smile) it does <strong>not</strong> revert the feature. The diff keeps the <code>--lossy</code> flag and the transliteration map, and restores one line: the default path drops non-ASCII again. Not an undo. A <em>reconciliation</em>: the feature now lives inside the spec instead of on top of it. That's the move the method is named for. When a railroad wheel wears out of round, you don't rebuild it. You <em>true</em> it, machining it back to the shape the rails require.</p>
 
   <p>Run the suite: <strong>33 passed.</strong></p>
+
+  <p>I'll be honest about why this beats any dashboard metric for me. Every time a test goes red on the agent's work and then green after the agent cleans up its own mess, I get the same little shot of dopamine. The AI just did extra work that I didn't have to do. No copy-paste loops. No chasing a fresh bug that wasn't there ten minutes ago. No writing a prompt precise enough to explain what broke. It appeals to the lazy person in me: I don't want to have to lift a finger.. I just want everything to just work. In a very real sense, that's the promise of AI actually showing up.</p>
 
   <h2>Why four words are enough</h2>
 
   <p>Which brings me back to the four words. The magic isn't in the phrase. It's in what the phrase points at.</p>
 
-  <p>An AI agent can misread your intent, but it cannot misread a failing test. Tests convert intent — fuzzy, human, negotiable — into something executable, binary, and non-negotiable. <strong>Tests are the vocabulary the AI uses to understand "done."</strong> When your spec lives in a test suite, you never have to win an argument with the model, because the argument was settled before it started.</p>
+  <p>An AI agent can misread your intent, but it cannot misread a failing test. Tests convert intent.. fuzzy, human, negotiable.. into something executable, binary, and non-negotiable. <strong>Tests are the vocabulary the AI uses to understand "done."</strong> When your spec lives in a test suite, you never have to win an argument with the model, because the argument was settled before it started.</p>
 
-  <p>That's also why each failure mode loses its teeth. Hallucinated APIs don't compile — red. Drift changes behavior — red. Context degradation forgets a convention — the structural tests remember — red. And the recovery from every one of them is the same four words, because the signal doesn't care <em>why</em> the train stopped.</p>
+  <p>That's also why each failure mode loses its teeth. Hallucinated APIs don't compile: red. Drift changes behavior: red. Context degradation forgets a convention: the structural tests remember. Red. And the recovery from every one of them is the same four words, because the signal doesn't care <em>why</em> the train stopped.</p>
 
-  <p>Notice what the pattern does <em>not</em> require. It doesn't run on trust in the model — it <strong>moves the trust to the suite</strong>, where it's re-earned on every run. Even if the AI has forgotten it wrote the code that's now breaking the tests, it's still responsible for fixing what it broke. It needs <strong>no line-by-line manual review</strong> of everything the agent writes, and <strong>no particular vendor</strong> — the gate file changes filename between Claude, Copilot, and Cursor; nothing else changes. The tests don't care what the AI intended.</p>
+  <p>Notice what the pattern does <em>not</em> require. It doesn't run on trust in the model. It <strong>moves the trust to the suite</strong>, where it's re-earned on every run. Even if the AI has forgotten it wrote the code that's now breaking the tests, it's still responsible for fixing what it broke. It needs <strong>no line-by-line manual review</strong> of everything the agent writes, and <strong>no particular vendor</strong>: the gate file changes filename between Claude, Copilot, and Cursor (or whatever LLM you happened to use); nothing else changes. The tests don't care what the AI intended.</p>
 
-  <p>Two objections come up every time I present this. <em>"What if the AI just edits the failing test?"</em> The gate file forbids it — if a test seems wrong, the agent must ask first — and a meta-test that fails on skipped or deleted tests backstops the rule. The enforcer isn't the agent's obedience; it's the suite. <em>"Isn't writing all those tests the real work?"</em> Yes — and that's the point. The agent writes them too, phase by phase, under the same gate — and the plan you review includes the test list, so the spec's load-bearing rules get pinned by early-phase tests before any later feature can drift past them. You're not doing more work; you're redirecting the review effort you were already spending, from re-reading diffs to reading a plan and watching a signal.</p>
+  <p>Two objections come up every time I present this.</p>
+
+  <p><em>"What if the AI just edits the failing test?"</em> Sometimes it tries. Frontier models mostly know better, but I don't run on "mostly." So there's a standing rule in the gate file: once written, the tests are locked. No modification without my express approval, and to get that approval the agent has to prove the test is wrong. A meta-test that fails on skipped or deleted tests backstops the rule. In other words, I make editing the failing test the <em>harder</em> path. The enforcer isn't the agent's obedience; it's the suite.</p>
+
+  <p><em>"Isn't writing all those tests the real work?"</em> Weren't you writing tests anyway? This is automated-testing 101 and has nothing to do with AI: for maybe 20% overhead on your coding effort, you get an encoded spec that yells the moment something breaks, even if it broke somewhere you're not looking. What AI changes is the economics. It turns out models are <em>good</em> at the boring mechanical work of writing tests, so point one at your codebase and tell it to test the hell out of it. The agent writes them phase by phase, under the same gate, and the plan you review includes the test list, so the spec's load-bearing rules get pinned by early-phase tests before any later feature can drift past them. You're not doing more work. You're redirecting the review effort you were already spending, from re-reading diffs to reading a plan and watching a signal.</p>
 
   <h2>It scales past toy demos</h2>
 
-  <p>I've been running this discipline on real work since those whack-a-mole weeks — codified into the four steps once the agents arrived. A cross-tool developer CLI I built this way — <a href="https://github.com/EdwardAF-IT/Personetta">Personetta</a>, open source — carries about 1,700 test cases at 91% coverage, including structural tests that fail the build if a file lands in the wrong folder. A documentation estate I helped rewrite is verified by more than 5,000 automated checks — diagram accuracy, sample-code correctness, live API calls from inside the docs. A production incident I remediated started with characterization tests that pinned the legacy code's exact behavior — down to the byte output of a key-derivation routine — before any AI-assisted refactoring touched it. Same four steps every time. Only the stations change.</p>
+  <p>I've been running this discipline on real work since those whack-a-mole weeks, codified into the four steps once the agents arrived. A cross-tool developer CLI I built this way, <a href="https://github.com/EdwardAF-IT/Personetta">Personetta</a>, open source, carries about 1,700 test cases at 91% coverage, including structural tests that fail the build even if a file lands in the wrong folder. A documentation estate I helped rewrite is verified by more than 5,000 automated checks: diagram accuracy, sample-code correctness, live API calls from inside the docs. A production incident I remediated started with characterization tests that pinned the legacy code's exact behavior, down to the byte output of a key-derivation routine, before any AI-assisted refactoring touched it. Even my home media library runs on it: a suite of tested CLI tools that catalogs and normalizes tens of thousands of files, a data-cleaning problem far nastier than it sounds. Same four steps every time. Only the stations change.</p>
 
   <h2>Start this afternoon</h2>
 
   <p>The whole system is fifteen minutes to set up:</p>
 
   <ol>
-    <li><strong>Lay the rails.</strong> Create the gate file for your tool. State the project's scope, the rules that must never break, the test layers you require, and the directive: <em>the tests must pass.</em> (Your first gate file won't be perfect. Mine wasn't. It gets better every time a test catches something you didn't.)</li>
-    <li><strong>Demand the route.</strong> Before any code, ask for a phased plan (use plan mode if your tool has one). Read it. This is your one high-leverage review.</li>
-    <li><strong>Run station to station.</strong> Execute one phase at a time, each ending with the suite green — unit tests plus at least one non-unit layer.</li>
-    <li><strong>Trust the signals.</strong> When anything drifts — and it will — say the four words and let the suite do the arguing.</li>
+    <li><strong>Lay the rails.</strong> Create the gate file for your tool. State the project's scope, the rules that must never break, your coding standards if you have them, the test layers you require, and the directive: <em>the tests must pass.</em> (Your first gate file won't be perfect. Mine wasn't. It gets better every time a test catches something you didn't.)</li>
+    <li><strong>Demand the route.</strong> Before any code, ask for a phased plan (use plan mode if your tool has one; put "Don't write any code yet" in the prompt if it doesn't). Read it until it matches what's in your head. This is your one high-leverage review.</li>
+    <li><strong>Run station to station.</strong> Execute one phase at a time, each ending with the suite green: unit tests plus at least one non-unit layer (I recommend integration).</li>
+    <li><strong>Trust the signals.</strong> When anything drifts, and it will, say the four words and let the suite do the arguing.</li>
   </ol>
 
-  <p>One more piece of context. The industry is converging on <em>spec-driven development</em> — writing the specification before the agent writes the code — and it's real progress. But a spec tells the agent what to build. It doesn't keep the agent honest while building. Truing is the execution half of that story: the spec plots the route; the tests are the signals; and the train runs fast precisely because it cannot steer off the line.</p>
+  <p>One more piece of context. The industry is converging on <em>spec-driven development</em>, writing the specification before the agent writes the code, and it's real progress. But a spec tells the agent what to build. It doesn't keep the agent honest while building. Truing is the execution half of that story: the spec plots the route, the tests are the signals, and the train runs fast precisely because it cannot steer off the line.</p>
 
-  <p>I wrote this one because the pattern changed how I work — and because it's simple enough that it can change how you work by the end of the afternoon.</p>
+  <p>I wrote this one because the pattern changed how I work.. and because it's simple enough that it can change how you work by the end of the afternoon.</p>
 
   <p><strong>The tests must pass.</strong></p>
 
